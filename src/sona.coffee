@@ -1,7 +1,7 @@
 class Sona
-  # `sounds` is an array of objects, each with `url` and `id` properties
+  # `sources` is an array of objects, each with `url` and `id` properties
   # e.g. [{ url: 'path/to/sound.mp3', id: 'mySound' }, { url: 'path/to/sound2.mp3', id: 'myOtherSound' }]
-  constructor: (sounds) ->
+  constructor: (sources) ->
     # Standardize access to AudioContext object
     window.AudioContext = window.AudioContext || window.webkitAudioContext
 
@@ -10,36 +10,69 @@ class Sona
     return if not @supported
 
     @context = new AudioContext()
-    @sounds = sounds
+    @sources = sources
+
+    @buffers = {}
+    @sounds = {}
 
   load: (callback) ->
     return if not @supported
 
-    @buffers = @buffers || {}
-
-    # Current sound to load
-    sound = @sounds.shift()
+    # Current source to load
+    source = @sources.shift()
 
     request = new XMLHttpRequest()
-    request.open 'GET', sound.url, true
+    request.open 'GET', source.url, true
     request.responseType = 'arraybuffer'
 
     # Decode loaded audio data
     request.onload = =>
       @context.decodeAudioData request.response, (buffer) =>
-        @buffers[sound.id] = buffer
+        @buffers[source.id] = buffer
 
-        if @sounds.length then @load callback
+        if @sources.length then @load callback
         else if typeof callback is 'function' then callback()
 
     request.send()
 
-  play: (id) ->
-    return if @buffers[id] is undefined or not @supported
+  play: (id, _loop = false) ->
+    return if not @supported or @buffers[id] is undefined
 
-    source = @context.createBufferSource()
-    source.buffer = @buffers[id]
-    source.connect @context.destination
-    source.start 0
+    @sounds[id] = @sounds[id] || {}
+
+    # Re-initialize the source node; they can only be played once
+    @sounds[id].sourceNode = @context.createBufferSource()  
+    @sounds[id].sourceNode.buffer = @buffers[id]
+    @sounds[id].sourceNode.loop = _loop
+
+    # Gain node - for volume
+    if not @sounds[id].gainNode
+      @sounds[id].gainNode = @context.createGain()
+      @sounds[id].gainNode.connect @context.destination
+    
+    @sounds[id].sourceNode.connect @sounds[id].gainNode
+    
+    # Play
+    @sounds[id].sourceNode.start 0
+
+  stop: (id) ->
+    return if not @supported or @sounds[id] is undefined
+    @sounds[id].sourceNode.stop 0
+
+  getVolume: (id) ->
+    return if not @supported or @sounds[id] is undefined
+    @sounds[id].gainNode.gain.value
+
+  setVolume: (id, volume) ->
+    return if not @supported or @sounds[id] is undefined
+    @sounds[id].gainNode.gain.value = volume
+
+  getPosition: (id) ->
+    return if not @supported or @buffers[id] is undefined
+    # pass
+
+  setPosition: (id) ->
+    return if not @supported or @buffers[id] is undefined
+    # pass
 
 window.Sona = Sona

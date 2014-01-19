@@ -12,10 +12,28 @@ var sona = new Sona([
 ]);
 
 sona.load(function () {
-    // All sounds loaded when callback is executed
+	// All sounds have loaded when this callback is executed
+
+    // Play a sound once at default volume
     sona.play('sample');
+
+    // Play a looping sound
+    sona.play('sample', true);
+
+    // Get volume of sound
+    sona.getVolume('sample');	// == 1
+
+    // Change volume to 50%
+    sona.setVolume('sample', 0.5);
+
+    // Stop the loop
+    sona.stop('sample');
 });
 ```
+
+### Compatibility
+
+Not supported in Internet Explorer. See [caniuse.com](http://caniuse.com/#feat=audio-api).
 
 ### Specs
 

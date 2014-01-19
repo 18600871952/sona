@@ -3,39 +3,58 @@
   describe('Sona', function() {
     var sona;
     sona = null;
-    beforeEach(function() {
-      return sona = new Sona([
-        {
-          url: 'assets/sample.mp3',
-          id: 'sample'
-        }, {
-          url: 'assets/test.mp3',
-          id: 'test'
-        }, {
-          url: 'assets/example.mp3',
-          id: 'example'
-        }
-      ]);
-    });
-    it('should load data into a buffer object', function() {
-      return sona.load(function() {
-        return expect(Object.keys(sona.buffers).length).toBe(3);
+    describe('Loading data', function() {
+      return it('should execute a callback when data is loaded', function() {
+        var spy;
+        sona = new Sona([
+          {
+            url: 'assets/sample.mp3',
+            id: 'sample'
+          }
+        ]);
+        spy = {
+          callback: function() {
+            return alert('Loaded!');
+          }
+        };
+        spyOn(spy, 'callback');
+        sona.load(spy.callback);
+        return expect(spy.callback).toHaveBeenCalled;
       });
     });
-    it('should execute a callback when data is loaded', function() {
-      var spy;
-      spy = {
-        callback: function() {
-          return alert('Loaded!');
-        }
-      };
-      spyOn(spy, 'callback');
-      sona.load(spy.callback);
-      return expect(spy.callback).toHaveBeenCalled;
-    });
-    return it('should play a loaded sound', function() {
-      return sona.load(function() {
-        return expect(sona.play('sample')).not.toThrow();
+    return describe('Playing sounds', function() {
+      beforeEach(function(done) {
+        sona = new Sona([
+          {
+            url: 'assets/sample.mp3',
+            id: 'sample'
+          }, {
+            url: 'assets/test.mp3',
+            id: 'test'
+          }, {
+            url: 'assets/example.mp3',
+            id: 'example'
+          }
+        ]);
+        return sona.load(function() {
+          return done();
+        });
+      });
+      it('should have populated a buffer object', function() {
+        return expect(Object.keys(sona.buffers).length).toBe(3);
+      });
+      it('should play a sound', function() {
+        return expect(function() {
+          return sona.play('sample');
+        }).not.toThrow();
+      });
+      return it('should play a looped sound', function() {
+        expect(function() {
+          return sona.play('sample', true);
+        }).not.toThrow();
+        return setTimeout(function() {
+          return sona.stop('sample');
+        }, 1000);
       });
     });
   });

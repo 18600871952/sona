@@ -3,31 +3,32 @@
   var Sona;
 
   Sona = (function() {
-    function Sona(sounds) {
+    function Sona(sources) {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
       this.supported = !!AudioContext;
       if (!this.supported) {
         return;
       }
       this.context = new AudioContext();
-      this.sounds = sounds;
+      this.sources = sources;
+      this.buffers = {};
+      this.sounds = {};
     }
 
     Sona.prototype.load = function(callback) {
-      var request, sound,
+      var request, source,
         _this = this;
       if (!this.supported) {
         return;
       }
-      this.buffers = this.buffers || {};
-      sound = this.sounds.shift();
+      source = this.sources.shift();
       request = new XMLHttpRequest();
-      request.open('GET', sound.url, true);
+      request.open('GET', source.url, true);
       request.responseType = 'arraybuffer';
       request.onload = function() {
         return _this.context.decodeAudioData(request.response, function(buffer) {
-          _this.buffers[sound.id] = buffer;
-          if (_this.sounds.length) {
+          _this.buffers[source.id] = buffer;
+          if (_this.sources.length) {
             return _this.load(callback);
           } else if (typeof callback === 'function') {
             return callback();
@@ -37,15 +38,56 @@
       return request.send();
     };
 
-    Sona.prototype.play = function(id) {
-      var source;
-      if (this.buffers[id] === void 0 || !this.supported) {
+    Sona.prototype.play = function(id, _loop) {
+      if (_loop == null) {
+        _loop = false;
+      }
+      if (!this.supported || this.buffers[id] === void 0) {
         return;
       }
-      source = this.context.createBufferSource();
-      source.buffer = this.buffers[id];
-      source.connect(this.context.destination);
-      return source.start(0);
+      this.sounds[id] = this.sounds[id] || {};
+      this.sounds[id].sourceNode = this.context.createBufferSource();
+      this.sounds[id].sourceNode.buffer = this.buffers[id];
+      this.sounds[id].sourceNode.loop = _loop;
+      if (!this.sounds[id].gainNode) {
+        this.sounds[id].gainNode = this.context.createGain();
+        this.sounds[id].gainNode.connect(this.context.destination);
+      }
+      this.sounds[id].sourceNode.connect(this.sounds[id].gainNode);
+      return this.sounds[id].sourceNode.start(0);
+    };
+
+    Sona.prototype.stop = function(id) {
+      if (!this.supported || this.sounds[id] === void 0) {
+        return;
+      }
+      return this.sounds[id].sourceNode.stop(0);
+    };
+
+    Sona.prototype.getVolume = function(id) {
+      if (!this.supported || this.sounds[id] === void 0) {
+        return;
+      }
+      return this.sounds[id].gainNode.gain.value;
+    };
+
+    Sona.prototype.setVolume = function(id, volume) {
+      if (!this.supported || this.sounds[id] === void 0) {
+        return;
+      }
+      return this.sounds[id].gainNode.gain.value = volume;
+    };
+
+    Sona.prototype.getPosition = function(id) {
+      if (!this.supported || this.buffers[id] === void 0) {
+
+      }
+    };
+
+    Sona.prototype.setPosition = function(id) {
+      if (!this.supported || this.buffers[id] === void 0) {
+
+      }
     };
 
     return Sona;
