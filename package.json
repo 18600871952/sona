@@ -1,0 +1,30 @@
+{
+  "name": "Sona",
+  "version": "1.0.0",
+  "description": "Web Audio API wrapper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/endemic/sona.git"
+  },
+  "keywords": [
+    "web",
+    "audio",
+    "sound",
+    "sfx"
+  ],
+  "author": "Nathan Demick",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/endemic/sona/issues"
+  },
+  "homepage": "https://github.com/endemic/sona",
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-coffee": "^2.2.0",
+    "gulp-util": "^3.0.1"
+  }
+}
