@@ -3,7 +3,7 @@ class Sona
   # e.g. [{ url: 'path/to/sound.mp3', id: 'mySound' }, { url: 'path/to/sound2.mp3', id: 'myOtherSound' }]
   constructor: (sources) ->
     # Standardize access to AudioContext object
-    window.AudioContext = window.AudioContext || window.webkitAudioContext
+    AudioContext = AudioContext || webkitAudioContext
 
     # Determine browser support
     @supported = !!AudioContext
@@ -41,7 +41,7 @@ class Sona
     @sounds[id] = @sounds[id] || {}
 
     # Re-initialize the source node; they can only be played once
-    @sounds[id].sourceNode = @context.createBufferSource()  
+    @sounds[id].sourceNode = @context.createBufferSource()
     @sounds[id].sourceNode.buffer = @buffers[id]
     @sounds[id].sourceNode.loop = _loop
 
@@ -49,11 +49,14 @@ class Sona
     if not @sounds[id].gainNode
       @sounds[id].gainNode = @context.createGain()
       @sounds[id].gainNode.connect @context.destination
-    
+
     @sounds[id].sourceNode.connect @sounds[id].gainNode
-    
+
     # Play
     @sounds[id].sourceNode.start 0
+
+  loop: (id) ->
+    @play(id, true)
 
   stop: (id) ->
     return if not @supported or @sounds[id] is undefined
@@ -75,4 +78,7 @@ class Sona
     return if not @supported or @buffers[id] is undefined
     # pass
 
-window.Sona = Sona
+if typeof exports != 'undefined'
+  module.exports = Sona
+else
+  window.Sona = Sona
