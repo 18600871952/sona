@@ -1,8 +1,8 @@
 {
-  "name": "Sona",
+  "name": "sona",
   "version": "1.0.0",
   "description": "Web Audio API wrapper",
-  "main": "index.js",
+  "main": "dist/sona.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
