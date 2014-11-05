@@ -1,51 +1,57 @@
-describe('Sona', function() {
-    describe('Loading data', function() {
+describe('Sona', function () {
+    describe('Loading data', function () {
         var sona,
             spy;
 
-        beforeEach(function () {
+        beforeEach(function (done) {
             sona = new Sona([{ url: 'assets/sample.mp3', id: 'sample' }]);
-            spy = jasmine.createSpy('sneaky');
+            spy = {
+                callback: function () {
+                    done()
+                }
+            };
+
+            spyOn(spy, 'callback').and.callThrough();
+            sona.load(spy.callback);
         });
 
-        it('should execute a callback when data is loaded', function() {
-            spyOn(spy, 'callback');
-            sona.load(spy.callback);
+        it('should execute a callback when data is loaded', function () {
             expect(spy.callback).toHaveBeenCalled();
         });
     });
 
-    describe('Playing sounds', function() {
+    describe('Playing sounds', function () {
         var sona;
 
-        beforeEach(function(done) {
+        beforeEach(function (done) {
             sona = new Sona([
                 { url: 'assets/sample.mp3', id: 'sample' },
                 { url: 'assets/test.mp3', id: 'test' },
                 { url: 'assets/example.mp3', id: 'example' }
             ]);
 
-            sona.load(function() {
+            sona.load(function () {
                 done();
             });
         });
 
-        it('should have populated a buffer object', function() {
+        it('should have populated a buffer object', function () {
             expect(Object.keys(sona.buffers).length).toBe(3);
         });
 
-        it('should play a sound', function() {
+        it('should play a sound', function () {
             expect(function () {
                 sona.play('sample');
             }).not.toThrow();
         });
 
-        it('should play a looped sound', function() {
-            expect(function() {
+        it('should play a looped sound', function () {
+            expect(function () {
                 sona.loop('sample');
             }).not.toThrow();
 
-            setTimeout(function() {
+            // To prevent an endless loop on the SpecRunner page
+            setTimeout(function () {
                 sona.stop('sample');
             }, 1000);
         });
