@@ -27,15 +27,21 @@ Sona = (function() {
       return function() {
         return _this.context.decodeAudioData(request.response, function(buffer) {
           _this.buffers[source.id] = buffer;
-          if (_this.sources.length) {
-            return _this.load(callback);
-          } else if (typeof callback === 'function') {
-            return callback();
-          }
+          return _this.next(callback);
+        }, function(e) {
+          return _this.next(callback);
         });
       };
     })(this);
     return request.send();
+  };
+
+  Sona.prototype.next = function(callback) {
+    if (this.sources.length) {
+      return this.load(callback);
+    } else if (typeof callback === 'function') {
+      return callback();
+    }
   };
 
   Sona.prototype.play = function(id, _loop) {
@@ -80,18 +86,6 @@ Sona = (function() {
       return;
     }
     return this.sounds[id].gainNode.gain.value = volume;
-  };
-
-  Sona.prototype.getPosition = function(id) {
-    if (!this.supported || this.buffers[id] === void 0) {
-
-    }
-  };
-
-  Sona.prototype.setPosition = function(id) {
-    if (!this.supported || this.buffers[id] === void 0) {
-
-    }
   };
 
   return Sona;
