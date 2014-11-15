@@ -1,6 +1,6 @@
 {
   "name": "sona",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Web Audio API wrapper",
   "main": "dist/sona.js",
   "scripts": {
@@ -11,10 +11,13 @@
     "url": "https://github.com/endemic/sona.git"
   },
   "keywords": [
-    "web",
+    "web audio",
     "audio",
     "sound",
-    "sfx"
+    "sfx",
+    "music",
+    "browser",
+    "browserify"
   ],
   "author": "Nathan Demick",
   "license": "MIT",

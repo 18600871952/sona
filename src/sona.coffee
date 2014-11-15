@@ -29,11 +29,15 @@ class Sona
     request.onload = =>
       @context.decodeAudioData request.response, (buffer) =>
         @buffers[source.id] = buffer
-
-        if @sources.length then @load callback
-        else if typeof callback is 'function' then callback()
+        @next callback
+      , (e) =>
+        @next callback
 
     request.send()
+
+  next: (callback) ->
+    if @sources.length then @load callback
+    else if typeof callback is 'function' then callback()
 
   play: (id, _loop = false) ->
     return if not @supported or @buffers[id] is undefined
@@ -69,14 +73,6 @@ class Sona
   setVolume: (id, volume) ->
     return if not @supported or @sounds[id] is undefined
     @sounds[id].gainNode.gain.value = volume
-
-  getPosition: (id) ->
-    return if not @supported or @buffers[id] is undefined
-    # pass
-
-  setPosition: (id) ->
-    return if not @supported or @buffers[id] is undefined
-    # pass
 
 if typeof exports != 'undefined'
   module.exports = Sona

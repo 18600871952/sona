@@ -4,7 +4,11 @@ describe('Sona', function () {
             spy;
 
         beforeEach(function (done) {
-            sona = new Sona([{ url: 'assets/sample.mp3', id: 'sample' }]);
+            sona = new Sona([
+                { url: 'assets/sample.mp3', id: 'sample' },
+                { url: 'obviously/404.mp3', id: 'garbage' }
+            ]);
+
             spy = {
                 callback: function () {
                     done()
