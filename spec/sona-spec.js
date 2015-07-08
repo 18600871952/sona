@@ -11,7 +11,7 @@ describe('Sona', function () {
 
             spy = {
                 callback: function () {
-                    done()
+                    done();
                 }
             };
 

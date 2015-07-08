@@ -3,13 +3,13 @@ class Sona
   # e.g. [{ url: 'path/to/sound.mp3', id: 'mySound' }, { url: 'path/to/sound2.mp3', id: 'myOtherSound' }]
   constructor: (sources) ->
     # Standardize access to AudioContext object
-    AudioContext = AudioContext || webkitAudioContext
+    StandardAudioContext = AudioContext || webkitAudioContext
 
     # Determine browser support
-    @supported = !!AudioContext
+    @supported = !!StandardAudioContext
     return if not @supported
 
-    @context = new AudioContext()
+    @context = new StandardAudioContext()
     @sources = sources
 
     @buffers = {}
