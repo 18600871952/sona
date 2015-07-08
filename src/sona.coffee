@@ -1,9 +1,13 @@
 class Sona
   # `sources` is an array of objects, each with `url` and `id` properties
-  # e.g. [{ url: 'path/to/sound.mp3', id: 'mySound' }, { url: 'path/to/sound2.mp3', id: 'myOtherSound' }]
+  # e.g. [{ url: 'path/to/sound.mp3', id: 'mySound' },
+  # { url: 'path/to/sound2.mp3', id: 'myOtherSound' }]
   constructor: (sources) ->
     # Standardize access to AudioContext object
-    StandardAudioContext = AudioContext || webkitAudioContext
+    StandardAudioContext = if typeof webkitAudioContext != 'undefined'
+      webkitAudioContext
+    else
+      AudioContext
 
     # Determine browser support
     @supported = !!StandardAudioContext
